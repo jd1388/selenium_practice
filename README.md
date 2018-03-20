@@ -1,0 +1,1 @@
+This is a practice project that I'm using to learn how to automate stuff in the browser with Selenium Webdriver. This is a node project that takes a search from the user and tries to find a page on Wikipedia.
