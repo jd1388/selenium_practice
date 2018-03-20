@@ -23,6 +23,12 @@ const determineSearchPlatform = platform => {
         case 'google':
             console.log(defaultMessage('Google'));
             return 'Google';
+        case 'stackoverflow':
+        case 'stack overflow':
+        case 'stack':
+        case 'overflow':
+            console.log(defaultMessage('Stack Overflow'));
+            return 'Stack Overflow';
         case '':
             console.log('Since you didn\'t give a search method, I\'ll use Google!\n');
             return 'Google';
@@ -58,8 +64,10 @@ reader.question('Where do you want to search?\n', searchPlatformAnswer => {
                 search('https://www.google.com', webdriver.By.id('lst-ib'), searchQuery, process.exit);
                 break;
             case 'YouTube':
-                search('https://www.youtube.com', webdriver.By.name('search_query'), searchQuery, process.exit)
+                search('https://www.youtube.com', webdriver.By.name('search_query'), searchQuery, process.exit);
                 break;
+            case 'Stack Overflow':
+                search('https://www.stackoverflow.com', webdriver.By.name('q'), searchQuery, process.exit);
         }
     });
 });
