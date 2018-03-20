@@ -10,15 +10,25 @@ const reader = readline.createInterface({
 let driver;
 
 const determineSearchPlatform = platform => {
-    switch (platform.toLowerCase().trim()) {
+    const formattedPlatform = platform.toLowerCase().trim();
+    const defaultMessage = platformToBeUsed => `Okay, I'll search on ${platformToBeUsed}\n`;
+
+    switch (formattedPlatform) {
         case 'wikipedia':
+            console.log(defaultMessage('Wikipedia'));
             return 'Wikipedia';
-        case 'google':
-            return 'Google';
         case 'youtube':
+            console.log(defaultMessage('YouTube'));
             return 'YouTube';
+        case 'google':
+            console.log(defaultMessage('Google'));
+            return 'Google';
+        case '':
+            console.log('Since you didn\'t give a search method, I\'ll use Google!\n');
+            return 'Google';
         default:
-            return 'Default';
+            console.log(`I don't know how to search with "${platform}", so I'll use Google!\n`);
+            return 'Google';
     }
 };
 
@@ -28,19 +38,17 @@ const search = (url, searchBar, query, next) => {
     });
 };
 
+const createDriver = () => {
+    return new webdriver.Builder()
+        .forBrowser('firefox')
+        .build();
+};
+
 reader.question('Where do you want to search?\n', searchPlatformAnswer => {
     let searchPlatform = determineSearchPlatform(searchPlatformAnswer);
 
-    if (searchPlatform === 'Default') {
-        console.log(`I don't know how to search with "${searchPlatformAnswer}", so I'll use Google!`);
-        searchPlatform = 'Google';
-    } else
-        console.log(`Okay, I'll search on ${searchPlatform}!\n`);
-
     reader.question('What would you like to search?\n', searchQuery => {
-        driver = new webdriver.Builder()
-            .forBrowser('firefox')
-            .build();
+        driver = createDriver();
 
         switch (searchPlatform) {
             case 'Wikipedia':
