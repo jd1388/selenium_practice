@@ -7,6 +7,8 @@ const reader = readline.createInterface({
     output: process.stdout
 });
 
+let driver;
+
 const determineSearchPlatform = platform => {
     switch (platform.toLowerCase().trim()) {
         case 'wikipedia':
@@ -20,41 +22,35 @@ const determineSearchPlatform = platform => {
     }
 };
 
+const search = (url, searchBar, query, next) => {
+    driver.get(url).then(() => {
+        driver.findElement(searchBar).sendKeys(query, webdriver.Key.ENTER, webdriver.Key.ENTER).then(() => next());
+    });
+};
+
 reader.question('Where do you want to search?\n', searchPlatformAnswer => {
-    const searchPlatform = determineSearchPlatform(searchPlatformAnswer);
+    let searchPlatform = determineSearchPlatform(searchPlatformAnswer);
 
     if (searchPlatform === 'Default') {
-        console.log(`I don't know how to search with ${searchPlatformAnswer}, so we will use Google!`);
+        console.log(`I don't know how to search with "${searchPlatformAnswer}", so I'll use Google!`);
         searchPlatform = 'Google';
     } else
         console.log(`Okay, I'll search on ${searchPlatform}!\n`);
 
     reader.question('What would you like to search?\n', searchQuery => {
-        const driver = new webdriver.Builder()
+        driver = new webdriver.Builder()
             .forBrowser('firefox')
             .build();
 
         switch (searchPlatform) {
             case 'Wikipedia':
-                driver.get('https://www.wikipedia.org/').then(() => {
-                    driver.findElement(webdriver.By.id('searchInput')).sendKeys(searchQuery, webdriver.Key.ENTER, webdriver.Key.ENTER).then(() => {
-                        process.exit(0);
-                    });
-                });
+                search('https://www.wikipedia.org', webdriver.By.id('searchInput'), searchQuery, process.exit);
                 break;
             case 'Google':
-                driver.get('https://www.google.com').then(() => {
-                    driver.findElement(webdriver.By.id('lst-ib')).sendKeys(searchQuery, webdriver.Key.ENTER, webdriver.Key.ENTER).then(() => {
-                        process.exit(0);
-                    })
-                });
+                search('https://www.google.com', webdriver.By.id('lst-ib'), searchQuery, process.exit);
                 break;
             case 'YouTube':
-                driver.get('https://www.youtube.com').then(() => {
-                    driver.findElement(webdriver.By.name('search_query')).sendKeys(searchQuery, webdriver.Key.ENTER, webdriver.Key.ENTER).then(() => {
-                        process.exit(0);
-                    })
-                });
+                search('https://www.youtube.com', webdriver.By.name('search_query'), searchQuery, process.exit)
                 break;
         }
     });
